@@ -1,0 +1,10 @@
+const w : number = window.innerWidth 
+const h : number = window.innerHeight 
+const scGap : number = 0.02 
+const strokeFactor : number = 90
+const delay : number = 20 
+const lineSizeFactor : number = 5.2 
+const rot : number = Math.PI / 4 
+const parts : number = 3
+const backColor : string = "#bdbdbd"
+const colors : Array<string> = ["#3F51B5", "#F44336", "#2196F3", "#4CAF50", "#009688"]
