@@ -204,3 +204,24 @@ class LineReflectedBall {
         this.curr.startUpdating(cb)
     }
 }
+
+class Renderer {
+
+    lrb : LineReflectedBall = new LineReflectedBall()
+    animator : Animator = new Animator()
+
+    render(context : CanvasRenderingContext2D) {
+        this.lrb.draw(context)
+    }
+
+    handleTap(cb : Function) {
+        this.lrb.startUpdating(() => {
+            this.animator.start(() => {
+                this.lrb.update(() => {
+                    this.animator.stop()
+                    cb()
+                })
+            })
+        })
+    }
+}
