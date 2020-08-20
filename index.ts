@@ -1,14 +1,13 @@
-import { timeStamp } from "console"
 
 const w : number = window.innerWidth 
 const h : number = window.innerHeight 
-const scGap : number = 0.02 
+const parts : number = 3
+const scGap : number = 0.02 / parts
 const strokeFactor : number = 90
 const delay : number = 20 
 const lineSizeFactor : number = 5.2 
-const rFactor : number = 8.9 
+const rFactor : number = 13.9 
 const rot : number = Math.PI / 4 
-const parts : number = 3
 const backColor : string = "#bdbdbd"
 const colors : Array<string> = ["#3F51B5", "#F44336", "#2196F3", "#4CAF50", "#009688"]
 
@@ -19,7 +18,7 @@ class ScaleUtil {
     }
 
     static divideScale(scale : number, i : number, n : number) : number {
-        return Math.min(1 / n, ScaleUtil.divideScale(scale, i, n)) * n 
+        return Math.min(1 / n, ScaleUtil.maxScale(scale, i, n)) * n 
     }
 
     static sinify(scale : number) : number {
@@ -51,7 +50,7 @@ class DrawingUtil {
         const size : number = Math.min(w, h) / lineSizeFactor 
         context.save()
         context.translate(w / 2, h / 2)
-        DrawingUtil.drawCircle(context, -w /2 + r + w * 0.5 * sf2, -h * 0.5 * sf3, r * sf1)
+        DrawingUtil.drawCircle(context, -w /2 + r + (w * 0.5 - 2 * r) * sf2, -(h * 0.5 + r) * sf3, r * sf1)
         context.save()
         context.rotate(rot * sf2)
         DrawingUtil.drawLine(context, 0, -size * sf1, 0, size * sf1)
@@ -72,6 +71,7 @@ class Stage {
 
     canvas : HTMLCanvasElement = document.createElement('canvas')
     context : CanvasRenderingContext2D 
+    renderer : Renderer = new Renderer()
 
     initCanvas() {
         this.canvas.width = w 
@@ -83,15 +83,18 @@ class Stage {
     render() {
         this.context.fillStyle = backColor 
         this.context.fillRect(0, 0, w, h)
+        this.renderer.render(this.context)
     }
 
     handleTap() {
         this.canvas.onmousedown = () => {
-
+            this.renderer.handleTap(() => {
+                this.render()
+            })
         }
     }
 
-    static initCanvas() {
+    static init() {
         const stage : Stage = new Stage()
         stage.initCanvas()
         stage.render()
@@ -220,6 +223,7 @@ class Renderer {
     handleTap(cb : Function) {
         this.lrb.startUpdating(() => {
             this.animator.start(() => {
+                cb()
                 this.lrb.update(() => {
                     this.animator.stop()
                     cb()
